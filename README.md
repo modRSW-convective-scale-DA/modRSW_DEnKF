@@ -1,7 +1,7 @@
 # modRSW_DEnKF
 ## Idealised DA experiments with the DEnKF and modRSW model and their relevance for convective-scale NWP
 
-This repository contains the relevant source code and running instructions for the research paper: 
+This repository contains the relevant source code and documentation for the research paper: 
 
 ```Kent et al (2020): Idealized forecast-assimilation experiments for convective-scale Numerical Weather Prediction;```
 
