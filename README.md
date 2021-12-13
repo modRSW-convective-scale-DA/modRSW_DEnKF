@@ -14,11 +14,18 @@ currently published on [EarthArxiv](https://eartharxiv.org/repository/view/1921/
 ...
 
 ## References
+#### Thesis + articles:
+
 * Kent, T. (2016): An idealised fluid model of Numerical Weather Prediction: dynamics and data assimilation. *PhD thesis, University of Leeds*. Available at [http://etheses.whiterose.ac.uk/17269/](http://etheses.whiterose.ac.uk/17269/).
 
 * Kent, T., Bokhove, O., Tobias, S.M. (2017): Dynamics of an idealised fluid model for investigating convective-scale data assimilation. *Tellus A: Dynamic Meteorology and Oceanography*, **69(1)**, 1369332. [DOI](https://www.tandfonline.com/doi/full/10.1080/16000870.2017.1369332).
 
 * Kent, T., Cantarello, L., Inverarity, G.W., Tobias, S.M., Bokhove, O. (2020): Idealised forecast-assimilation experiments for convective-scale Numerical Weather Prediction. *EarthArXiv*, [DOI](https://eartharxiv.org/repository/view/1921/). 
+
+#### Presentations:
+
+* Kent, T.: 'The modRSW model -- physical basis, numerics, and dynamics', [DA workshop](https://tkent198.github.io/workshop.html), University of Leeds, 16 May 2019. 
+* Kent, T., Inverarity, G., Cantarello, L., Tobias, S.M., Bokhove, O.: 'Idealised forecast-assimilation experiments and their relevance for convective-scale Numerical Weather Prediction', EGU General Assembly, Vienna, 7-12 April 2019. [Slides](https://tkent198.github.io/files/egu2019_DA.pdf).
 ----
 
 ## Getting started
