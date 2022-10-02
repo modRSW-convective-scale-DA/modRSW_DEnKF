@@ -64,6 +64,10 @@ if(Neq==4): n_obs_v = config.n_obs_v
 n_obs_r = config.n_obs_r
 U_relax = config.U_relax
 tau_rel = config.tau_rel
+h_obs_mask = config.h_obs_mask
+hu_obs_mask = config.hu_obs_mask
+hr_obs_mask = config.hr_obs_mask
+if(Neq==4): hv_obs_mask = config.hv_obs_mask
 
 #################################################################
 # create directory for output
@@ -145,9 +149,6 @@ except:
     Y_obs = np.empty([n_obs, Nmeas])
     if(Neq==3): ob_noise = np.repeat(ob_noise, [n_obs_h,n_obs_u,n_obs_r])
     if(Neq==4): ob_noise = np.repeat(ob_noise, [n_obs_h,n_obs_u,n_obs_v,n_obs_r])
-    if(n_obs_h!=0): h_obs_mask = np.array(list(range(0, n_obs_h)))
-    if(Neq==3 and n_obs_r!=0): hr_obs_mask = np.array(list(range(n_obs_h+n_obs_u, n_obs_h+n_obs_u+n_obs_r)))
-    if(Neq==4 and n_obs_r!=0): hr_obs_mask = np.array(list(range(n_obs_h+n_obs_u+n_obs_v, n_obs_h+n_obs_u+n_obs_v+n_obs_r)))
     for T in range(np.size(assim_time)-1):
         X_tr = U_tmp[:, :, T+1].flatten()
         X_tr = X_tr.T

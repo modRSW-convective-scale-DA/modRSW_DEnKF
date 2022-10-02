@@ -89,6 +89,7 @@ Q_FUNC = 'Q_nhr()'                  # Q_predef(): user-specified error covarianc
 rMODNOISE = 0                       # binary parameter to control the presence of additive inflation in r (1=yes,0=no)
 hMODNOISE = 1                    # binary parameter to control the presence of additive inflation in sigma (1=yes,0=no)
 
+'''
 ### OUTER LOOP PARAMETERS (main_p.py) ###
 Parameters for outer loop are specified in main_p.py 
 loc     : localisation scale

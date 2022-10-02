@@ -82,6 +82,10 @@ def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
     rtps = config.rtps
     U_relax = config.U_relax
     tau_rel = config.tau_rel
+    h_obs_mask = config.h_obs_mask
+    hu_obs_mask = config.hu_obs_mask
+    hr_obs_mask = config.hr_obs_mask
+    if(Neq==4): hv_obs_mask = config.hv_obs_mask
 
     ################################################################ 
 
@@ -191,8 +195,8 @@ def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
     OI.fill(np.nan)
 
     # create readme file of exp summary and save
-    if(Neq==3): PARS = [Nk_fc, Nk_tr, n_ens, assim_time, pars_enda, sig_ic, n_obs, NIAU, dres, n_obs_h, n_obs_u, n_obs_r, nd, Neq, L, ob_noise]
-    if(Neq==4): PARS = [Nk_fc, Nk_tr, n_ens, assim_time, pars_enda, sig_ic, n_obs, NIAU, dres, n_obs_h, n_obs_u, n_obs_r, nd, Neq, L, ob_noise, n_obs_v]
+    if(Neq==3): PARS = [Nk_fc, Nk_tr, n_ens, assim_time, pars_enda, sig_ic, n_obs, NIAU, dres, n_obs_h, n_obs_u, n_obs_r, nd, Neq, L, ob_noise, h_obs_mask, hu_obs_mask, hr_obs_mask]
+    if(Neq==4): PARS = [Nk_fc, Nk_tr, n_ens, assim_time, pars_enda, sig_ic, n_obs, NIAU, dres, n_obs_h, n_obs_u, n_obs_r, nd, Neq, L, ob_noise, n_obs_v, h_obs_mask, hu_obs_mask, hr_obs_mask, hv_obs_mask]
     create_readme(dirn, config_file, i, j, k, l)
     
     ##################################################################

@@ -1,5 +1,5 @@
 #######################################################################
-# modRSW model with topography compatible with python3
+# Script to run the modRSW model
 #######################################################################
 '''
 Given mesh, IC, time paramters, integrates modRSW and plots evolution. 
@@ -35,27 +35,25 @@ config = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(config)
 
 Neq = config.Neq
-Nk = config.Nk
+Nk = config.Nk_tr
 ic = config.ic
 outdir = config.outdir
-cfl_fc = config.cfl
+cfl_fc = config.cfl_fc
 cc2 = config.cc2
 beta = config.beta
 alpha2 = config.alpha2
 g = config.g
 H0 = config.H0
-#H_pert = config.H_pert
 L = config.L
 A = config.A
 V = config.V
 tn = config.tn
-#dt = config.dt
-#kx1 = config.kx1
 Ro = config.Ro
 Fr = config.Fr
 Hc = config.Hc
 Hr = config.Hr
 Nmeas = config.Nmeas
+Nforec = config.Nforec
 tmax = config.tmax
 dtmeasure = config.dtmeasure
 tmeasure = config.tmeasure
@@ -74,7 +72,7 @@ print(' ')
 # create directory for output
 #################################################################
 
-dirname = str('/test_model')
+dirname = str('/nature_run')
 dirn = str(outdir+dirname)
 #check if dir exixts, if not make it
 try:
@@ -92,46 +90,33 @@ x = grid[1]
 xc = grid[2]
 
 ##################################################################    
-#'''%%%----- Apply initial conditions -----%%%'''
+### Apply initial conditions
 ##################################################################
 print('Generate initial conditions...')
 U0,B = ic(x,Nk,Neq,H0,L,A,V)
 
-# Frequency of inertia-gravity wave used as an inflow on one end
-#w1 = np.sqrt((1./Ro)**2+(H0/Fr**2)*kx1**2)
-
-# 
-#U0[0,:] = H0+H_pert*np.cos(kx1*xc)
-#U0[1,:] = H_pert*(w1/(H0*kx1))*np.cos(kx1*xc)*H0
-#U0[2,:] = H_pert*(1./(Ro*H0*kx1))*np.sin(kx1*xc)*H0
-
 ### 4 panel subplot for initial state of 4 vars
-fig, axes = plt.subplots(4, 1, figsize=(8,8))
+if(Neq==3): fig, axes = plt.subplots(3, 1, figsize=(8,8))
+if(Neq==4): fig, axes = plt.subplots(4, 1, figsize=(8,8))
 plt.suptitle("Initial condition with Nk = %d" %Nk)
 
 axes[0].plot(xc, U0[0,:]+B, 'b')
-#axes[0].plot(xc, B, 'k', linewidth=2.)
+axes[0].plot(xc, B, 'k', linewidth=2.)
 axes[0].set_ylabel('$h_0(x)$',fontsize=18)
-#axes[0].set_ylim([0,2*H0])
+axes[0].set_ylim([0,2*H0])
 
 axes[1].plot(xc, U0[1,:]/U0[0,:], 'b')
-#axes[1].set_ylim([-2,2])
+axes[1].set_ylim([-2,2])
 axes[1].set_ylabel('$u_0(x)$',fontsize=18)
-
-#axes[2].plot(xc, U0[3,:]/U0[0,:], 'b')
-#axes[2].set_ylim([-2,2])
-#axes[2].set_ylabel('$v_0(x)$',fontsize=18)
 
 if(Neq==3):
     axes[2].plot(xc, U0[2,:]/U0[0,:], 'b')
     axes[2].set_ylabel('$r_0(x)$',fontsize=18)
-    #axes[2].set_ylim([-0.025,0.15])
     axes[2].set_xlabel('$x$',fontsize=18)
 
 if(Neq==4):
     axes[2].plot(xc, U0[2,:]/U0[0,:], 'b')
     axes[2].set_ylabel('$v_0(x)$',fontsize=18)
-    #axes[2].set_ylim([-0.025,0.15])
     axes[2].set_xlabel('$x$',fontsize=18)
 
     axes[3].plot(xc, U0[3,:]/U0[0,:], 'b')
@@ -156,39 +141,68 @@ index = 1
 ### Relaxation solution ###
 U_rel = U_relax(Neq,Nk,L,V,xc,U)
 
+### PLOT AND STORE RELAXATION SOLUTION
+if(Neq==3): fig, axes = plt.subplots(3, 1, figsize=(8,8))
+if(Neq==4): fig, axes = plt.subplots(4, 1, figsize=(8,8)) 
+plt.suptitle("Relaxation solution with Nk = %d" %Nk)
+
+axes[0].plot(xc, U_rel[0,:], 'b',label='Relaxation solution')
+axes[0].set_ylabel('$h(x)$',fontsize=18)
+axes[0].get_yaxis().set_label_coords(-0.1,1.5)
+axes[0].set_xticklabels([])
+axes[0].tick_params(labelsize=15)
+
+axes[1].plot(xc, U_rel[1,:], 'r')
+axes[1].set_ylabel('$u(x)$',fontsize=18)
+axes[1].get_yaxis().set_label_coords(-0.1,1.5)
+axes[1].set_xticklabels([])
+axes[1].tick_params(labelsize=15)
+
+if(Neq==3):
+    axes[2].plot(xc, U_rel[2,:], 'r')
+    axes[2].set_ylabel('$r(x)$',fontsize=18)
+    axes[2].get_yaxis().set_label_coords(-0.1,1.5)
+    axes[2].set_xlabel('$x$',fontsize=18)
+    axes[2].tick_params(labelsize=15)
+
+if(Neq==4):
+    axes[2].plot(xc, U_rel[2,:], 'b')
+    axes[2].set_ylabel('$v(x)$',fontsize=18)
+    axes[2].get_yaxis().set_label_coords(-0.1,1.5)
+    axes[2].set_xticklabels([])
+    axes[2].tick_params(labelsize=15)
+
+    axes[3].plot(xc, U_rel[3,:], 'r')
+    axes[3].set_ylabel('$r(x)$',fontsize=18)
+    axes[3].get_yaxis().set_label_coords(-0.1,1.5)
+    axes[3].set_xlabel('$x$',fontsize=18)
+    axes[3].tick_params(labelsize=15)
+
+name_fig = "/U_rel_Nk%d.png" %Nk
+f_name_fig = str(dirn+name_fig)
+plt.savefig(f_name_fig)
+print("** Relaxation solution "+str(name_fig)+" saved to "+ dirn)
+
 ##################################################################
 #'''%%%----- integrate forward in time until tmax ------%%%'''
 ##################################################################
-U_array = np.empty((Neq,Nk,Nmeas+1))
+U_array = np.empty((Neq,Nk,Nmeas+Nforec+1))
 U_array[:,:,0] = U0
 U_hovplt = np.zeros([Neq,Nk,120000])
 t_hovplt = np.zeros(120000)
 p=0
 i=0
-#dt = 5.28e-05
 
 print(' ')
 print('Integrating forward from t =', tn, 'to', tmeasure,'...')
 while tn < tmax:
 
- #   dt_old = np.copy(dt)
-
     dt = time_step(U,Kk,cfl_fc,cc2,beta,g)
     tn = tn + dt
 
-   # dtmin = min(dt,dt_old)
-
     print(tn)
-#    U_infl = [H0+H_pert*np.cos(kx1*0.-w1*tn),(w1/(H0*kx1))*H_pert*np.cos(kx1*0.-w1*tn),(1./(Ro*H0*kx1))*H_pert*np.sin(kx1*0.-w1*tn)]
-#    U_infl[1] = U_infl[0]*U_infl[1]
-#    U_infl[2] = U_infl[0]*U_infl[2]
-
-#    if tn > tmeasure:
-#        dt = dt - (tn - tmeasure) + 1e-12
-#        tn = tmeasure + 1e-12
 
     U = step_forward_topog(U,B,dt,tn,Neq,Nk,Kk,Hc,Hr,cc2,beta,alpha2,g)
-#    U = step_forward_modRSW_inflow(U,dt,Neq,Nk,Kk,Ro,alpha2,Hc,Hr,cc2,beta,g,U_infl)
 #    U = step_forward_modRSW(U,U_rel,dt,Neq,Nk,Kk,Ro,alpha2,Hc,Hr,cc2,beta,g,tau_rel)
 
     # Save data for hovmoller plot
@@ -202,36 +216,34 @@ while tn < tmax:
         print(' ')
         print('Plotting at time =',tmeasure)
 
-        fig, axes = plt.subplots(4, 1, figsize=(6,8))
+        if(Neq==3): fig, axes = plt.subplots(3, 1, figsize=(6,8)) 
+        if(Neq==4): fig, axes = plt.subplots(4, 1, figsize=(6,8))
         plt.suptitle("Model trajectories at t = %.3f with Nk =%d" %(tmeasure,Nk))
         
         axes[0].plot(xc, U[0,:]+B, 'b')
-#        axes[0].plot(xc, B, 'k', linewidth=2.0)
-#        axes[0].plot(xc,Hc*np.ones(len(xc)),'r:')
-#        axes[0].plot(xc,Hr*np.ones(len(xc)),'r:')
-#        axes[0].set_ylim([0,3*H0])
+        axes[0].plot(xc, B, 'k', linewidth=2.0)
+        axes[0].plot(xc,Hc*np.ones(len(xc)),'r:')
+        axes[0].plot(xc,Hr*np.ones(len(xc)),'r:')
+        axes[0].set_ylim([0,3*H0])
         axes[0].set_ylabel('$h(x)$',fontsize=18)
         
         axes[1].plot(xc, U[1,:]/U[0,:], 'b')
-#        axes[1].set_ylim([-2,2])
+        axes[1].set_ylim([-2,2])
         axes[1].set_ylabel('$u(x)$',fontsize=18)
 
         if(Neq==3):
             axes[2].plot(xc, U[2,:]/U[0,:], 'b')
             axes[2].plot(xc,np.zeros(len(xc)),'k--')
             axes[2].set_ylabel('$r(x)$',fontsize=18)
-#           axes[2].set_ylim([-0.025,0.15])
             axes[2].set_xlabel('$x$',fontsize=18)
 
         if(Neq==4):
             axes[2].plot(xc, U[2,:]/U[0,:], 'b')
             axes[2].plot(xc,np.zeros(len(xc)),'k--')
             axes[2].set_ylabel('$v(x)$',fontsize=18)
-#           axes[2].set_ylim([-0.025,0.15])
             axes[2].set_xlabel('$x$',fontsize=18)
     
             axes[3].plot(xc, U[3,:]/U[0,:], 'b')
-            #axes[3].set_ylim([-2,2])
             axes[3].set_ylabel('$r(x)$',fontsize=18)
 
         name_fig = "/t%d_Nk%d.png" %(index, Nk)
@@ -267,7 +279,6 @@ print('Ro =', Ro)
 print('Fr = ', Fr)
 print('(H_0 , H_c , H_r) =', [H0, Hc, Hr])  
 print(' Mesh: number of elements Nk =', Nk)
-#print(' Minimum time step =', dtmin)
 print(' ')   
 print(' ----------- END OF SUMMARY ---------- ')
 print(' ')  

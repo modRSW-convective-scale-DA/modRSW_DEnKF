@@ -61,6 +61,10 @@ n_obs_h = config.n_obs_h
 n_obs_u = config.n_obs_u
 if(Neq==4): n_obs_v = config.n_obs_v
 n_obs_r = config.n_obs_r
+h_obs_mask = config.h_obs_mask
+hu_obs_mask = config.hu_obs_mask
+hr_obs_mask = config.hr_obs_mask
+if(Neq==4): hv_obs_mask = config.hv_obs_mask
 
 ## 1. CHOOSE ijkl. E.g., for test_enkf1111/ [i,j,k,l] = [0,0,0,0]
 n_job = int(sys.argv[2])-1
@@ -122,19 +126,12 @@ if(Neq==3):
     h_mask = list(range(0,Nk_fc))
     hu_mask = list(range(Nk_fc,2*Nk_fc))
     hr_mask = list(range(2*Nk_fc,3*Nk_fc))
-    h_obs_mask = list(range(0,n_obs_h))
-    hu_obs_mask = list(range(n_obs_h,n_obs_h+n_obs_u))
-    hr_obs_mask = list(range(n_obs_h+n_obs_u,n_obs_h+n_obs_u+n_obs_r))
 
 if(Neq==4):
     h_mask = list(range(0,Nk_fc))
     hu_mask = list(range(Nk_fc,2*Nk_fc))
     hv_mask = list(range(2*Nk_fc,3*Nk_fc))
     hr_mask = list(range(3*Nk_fc,4*Nk_fc))
-    h_obs_mask = list(range(0,n_obs_h))
-    hu_obs_mask = list(range(n_obs_h,n_obs_h+n_obs_u))
-    hv_obs_mask = list(range(n_obs_h+n_obs_u,n_obs_h+n_obs_u+n_obs_v))
-    hr_obs_mask = list(range(n_obs_h+n_obs_u+n_obs_v,n_obs_h+n_obs_u+n_obs_v+n_obs_r)) 
 
 # masks for locating obs locations
 row_vec_h = list(range(obs_h_d, Nk_fc+1, obs_h_d))

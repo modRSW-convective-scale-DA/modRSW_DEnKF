@@ -133,6 +133,9 @@ def analysis_step_enkf_v3(U_fc, U_tr, Y_obs, H, tmeasure, dtmeasure, index, pars
     n_obs_r = pars[11]
     n_d = pars[12]  
     ob_noise = pars[15]
+    h_obs_mask = pars[16]
+    hu_obs_mask = pars[17]
+    hr_obs_mask = pars[18]
 
     #Nk_fc = np.shape(U_fc)[1] # fc resolution (no. of cells)
     Kk_fc = L/Nk_fc # fc resolution (cell length)
@@ -282,12 +285,7 @@ def analysis_step_enkf_v3(U_fc, U_tr, Y_obs, H, tmeasure, dtmeasure, index, pars
     # now inflated, transform back to x = (h,u,r) for saving and later plotting
     Xan[hu_mask,:] = Xan[hu_mask,:] / Xan[h_mask,:]
     Xan[hr_mask,:] = Xan[hr_mask,:] / Xan[h_mask,:]
-    
-    # masks for locating observations in observation vector
-    h_obs_mask = list(range(0,n_obs_h))
-    hu_obs_mask = list(range(n_obs_h,n_obs_h+n_obs_u))
-    hr_obs_mask = list(range(n_obs_h+n_obs_u,n_obs_h+n_obs_u+n_obs_r))
-    
+     
     ## observational influence diagnostics
     print(' ')
     print('--------- OBSERVATIONAL INFLUENCE DIAGNOSTICS:---------')
@@ -350,6 +348,10 @@ def analysis_step_enkf_v4(U_fc, U_tr, Y_obs, H, tmeasure, dtmeasure, index, pars
     n_d = pars[12]  
     ob_noise = pars[15]
     n_obs_v = pars[16] 
+    h_obs_mask = pars[17]
+    hu_obs_mask = pars[18]
+    hr_obs_mask = pars[19]
+    if(Neq==4): hv_obs_mask = pars[20]
 
     #Nk_fc = np.shape(U_fc)[1] # fc resolution (no. of cells)
     Kk_fc = L/Nk_fc # fc resolution (cell length)
@@ -502,12 +504,6 @@ def analysis_step_enkf_v4(U_fc, U_tr, Y_obs, H, tmeasure, dtmeasure, index, pars
     Xan[hu_mask,:] = Xan[hu_mask,:] / Xan[h_mask,:]
     Xan[hv_mask,:] = Xan[hv_mask,:] / Xan[h_mask,:]
     Xan[hr_mask,:] = Xan[hr_mask,:] / Xan[h_mask,:]
-    
-    # masks for locating observations in observation vector
-    h_obs_mask = list(range(0,n_obs_h))
-    hu_obs_mask = list(range(n_obs_h,n_obs_h+n_obs_u))
-    hv_obs_mask = list(range(n_obs_h+n_obs_u,n_obs_h+n_obs_u+n_obs_v))
-    hr_obs_mask = list(range(n_obs_h+n_obs_u+n_obs_v,n_obs_h+n_obs_u+n_obs_v+n_obs_r))
     
     ## observational influence diagnostics
     print(' ')
