@@ -20,6 +20,7 @@ import os
 import errno
 import sys
 import importlib.util
+import shutil
 
 # HANDLE WARNINGS AS ERRORS
 ##################################################################
@@ -30,16 +31,12 @@ warnings.filterwarnings("error")
 # CUSTOM FUNCTIONS AND MODULES REQUIRED
 ##################################################################
 
-#from parameters import *
-#from f_modRSW import make_grid 
-#from f_enkf_modRSW import generate_truth
-#from init_cond_modRSW import init_cond_topog4, init_cond_topog_cos
-#from create_readme import create_readme
 from subr_enkf_modRSW_p import run_enkf
 
 ##################################################################
 # IMPORT PARAMETERS FROM CONFIGURATION FILE
 ##################################################################
+config_string = sys.argv[1]
 spec = importlib.util.spec_from_file_location("config", sys.argv[1])
 config = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(config)
@@ -47,6 +44,7 @@ spec.loader.exec_module(config)
 outdir = config.outdir
 ic = config.ic
 add_inf = config.add_inf
+loc = config.loc
 rtpp = config.rtpp
 rtps = config.rtps 
 
@@ -78,12 +76,13 @@ except:
 print(' ')
 print(' ------- ENTERING EnKF OUTER LOOP ------- ')  
 print(' ')
-#for i in range(0,len(loc)):
-i = int(sys.argv[2])-1
-for j in range(0,len(add_inf)):
-    for k in range(0,len(rtpp)):
-        for l in range(0,len(rtps)):
-            run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, outdir, sys.argv[1])
+for i in range(0,len(loc)):
+    for j in range(0,len(add_inf)):
+        for k in range(0,len(rtpp)):
+            for l in range(0,len(rtps)):
+                print(i,j,k,l)
+                if __name__ == '__main__': 
+                    run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, outdir, config_string)
 print(' ')   
 print(' --------- FINISHED OUTER LOOP -------- ')
 print(' ')   

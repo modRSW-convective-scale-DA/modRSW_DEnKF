@@ -18,6 +18,7 @@ import numpy as np
 import os
 import errno
 import multiprocessing as mp
+from multiprocessing import Lock
 from datetime import datetime
 import shutil
 import importlib.util
@@ -29,7 +30,7 @@ import sys
 
 #from parameters import * # module storing fixed parameters
 from f_modRSW import make_grid, step_forward_topog, ens_forecast, ens_forecast_topog
-from f_enkf_modRSW import analysis_step_enkf_v4
+from f_enkf_modRSW import analysis_step_enkf_v3
 from create_readme import create_readme
 
 def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
@@ -116,8 +117,7 @@ def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
     ##################################################################
     # Construct the model error covariance matrix
     ##################################################################
-    Q = np.load(str(dirname + '/Qnew.npy'))
-#    Q = np.diag(np.concatenate(map(lambda x: np.repeat(x**2, Nk_fc), model_noise)))
+    Q = np.load(str(dirname + '/Qmatrix.npy'))
 
     ##################################################################
     # Mesh generation for forecasts
@@ -152,8 +152,6 @@ def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
         for N in range(0,n_ens):
             # add sig_ic to EACH GRIDPOINT
             U0ens[jj,:,N] = U0_fc[jj,:] + sig_ic[jj]*np.random.randn(Nk_fc)
-            # add sig_ic to TRAJECTORY as a whole
-            #U0ens[jj,:,N] = U0_fc[jj,:] + sig_ic[jj]*np.random.randn(1)
 
     if(Neq==3):
         # if hr < 0, set to zero:
@@ -170,8 +168,8 @@ def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
     # if h < 0, set to epsilon:
     h = U0ens[0, :, :]
     h[h < 0.] = 1e-3
-    U0ens[0, :, :] = h
-    
+    U0ens[0, :, :] = h    
+
     np.save(dirn+'/U0ens.npy',U0ens)
 
     ### Relaxation solution ###
@@ -215,10 +213,9 @@ def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
     #OI[:,0] = 0.0 # No obs assimilated at the initial time
     index = 0 # to step through assim_time
     tmeasure = dtmeasure # reset tmeasure    
-    
+
     while tmeasure-dtmeasure < t_end_assim and index < Nmeas:
         
-        os.sched_setaffinity(0, range(0, os.cpu_count()))
         print(np.shape(U))
      
         try: 
@@ -245,8 +242,8 @@ def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
                 q2store[:,:,index,0] = np.copy(q) 
 
                 pool = mp.Pool(processes=num_cores_use)
-                mp_out = [pool.apply_async(ens_forecast, args=(N, U, U_rel, q, Neq, Nk_fc, Kk_fc, cfl_fc, assim_time, index, tmeasure, dtmeasure, Hc, Hr, cc2, beta, alpha2, g, Ro, tau_rel)) for N in range(0,n_ens)]
-                #mp_out = [pool.apply_async(ens_forecast_topog, args=(N, U, B, q, Neq, Nk_fc, Kk_fc, cfl_fc, assim_time, index, tmeasure, dtmeasure, Hc, Hr, cc2, beta, alpha2, g)) for N in range(0,n_ens)]
+#                mp_out = [pool.apply_async(ens_forecast, args=(N, U, U_rel, q, Neq, Nk_fc, Kk_fc, cfl_fc, assim_time, index, tmeasure, dtmeasure, Hc, Hr, cc2, beta, alpha2, g, Ro, tau_rel)) for N in range(0,n_ens)]
+                mp_out = [pool.apply_async(ens_forecast_topog, args=(N, U, B, q, Neq, Nk_fc, Kk_fc, cfl_fc, assim_time, index, tmeasure, dtmeasure, Hc, Hr, cc2, beta, alpha2, g)) for N in range(0,n_ens)]
                 U = [p.get(timeout=TIMEOUT_PAR) for p in mp_out]
 
                 pool.close()
@@ -269,7 +266,7 @@ def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
                 print('------------- FORECAST STEP: END -------------')
                 print('----------------------------------------------')
                 print(' ')
-        
+
             ##################################################################
             #  calculate analysis at observing time then integrate forward  #
             ##################################################################
@@ -307,8 +304,8 @@ def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
 
                 pool = mp.Pool(processes=num_cores_use)
 
-                mp_out = [pool.apply_async(ens_forecast, args=(N, U_forec, U_rel, q, Neq, Nk_fc, Kk_fc, cfl_fc, forec_time, forec_T-1, tforec+dtmeasure, dtmeasure, Hc, Hr, cc2, beta, alpha2, g, Ro, tau_rel)) for N in range(0,n_ens)]
-                #mp_out = [pool.apply_async(ens_forecast_topog, args=(N, U_forec, B, q, Neq, Nk_fc, Kk_fc, cfl_fc, forec_time, forec_T-1, tforec+dtmeasure, dtmeasure, Hc, Hr, cc2, beta, alpha2, g)) for N in range(0,n_ens)]
+#                mp_out = [pool.apply_async(ens_forecast, args=(N, U_forec, U_rel, q, Neq, Nk_fc, Kk_fc, cfl_fc, forec_time, forec_T-1, tforec+dtmeasure, dtmeasure, Hc, Hr, cc2, beta, alpha2, g, Ro, tau_rel)) for N in range(0,n_ens)]
+                mp_out = [pool.apply_async(ens_forecast_topog, args=(N, U_forec, B, q, Neq, Nk_fc, Kk_fc, cfl_fc, forec_time, forec_T-1, tforec+dtmeasure, dtmeasure, Hc, Hr, cc2, beta, alpha2, g)) for N in range(0,n_ens)]
                 U_forec = [p.get(timeout=TIMEOUT_PAR) for p in mp_out]
 
                 pool.close()
@@ -352,19 +349,12 @@ def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
 
     ##################################################################
 
-
-    #PARS = [Nk_fc, Nk_tr, n_ens, assim_time, pars_enda, sig_ic, n_obs, NIAU]
-
-    # create readme file and save
-    #create_readme(dirn, config_file)
-
     np.save(str(dirn+'/B'),B)
     np.save(str(dirn+'/X_array'),X_array)
     np.save(str(dirn+'/X_tr_array'),X_tr_array)
     np.save(str(dirn+'/Xan_array'),Xan_array)
     np.save(str(dirn+'/X_forec'),X_forec)
     np.save(str(dirn+'/qstored'),q2store)
-#    np.save(str(dirn+'/Y_obs_array'),Y_obs_array)
     np.save(str(dirn+'/OI'),OI)
         
     print(' *** Data saved in :', dirn)
@@ -395,8 +385,6 @@ def run_enkf(i, j, k, l, ic, U_tr_array, Y_obs, H, dirname, config_file):
         print('>>> imperfect model scenario') 
     print(' ')  
     print('Number of ensembles =', n_ens)  
-#    print 'Assimilation times  =', assim_time[1:]
-#    print 'Observation density: observe every', pars_ob[0], 'gridcells...'
     print('i.e., total no. of obs. =', n_obs)
     print('Observation noise =', ob_noise)  
     print('RTPP (ensemble) factor =', pars_enda[0])

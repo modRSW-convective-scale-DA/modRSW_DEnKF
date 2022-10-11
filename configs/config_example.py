@@ -52,8 +52,8 @@ cc2 = 0.1*g*Hr # coefficient controlling suppressing of convection
 ''' FILTER PARAMETERS '''
 dtmeasure = 0.144  # duration of forecast step in non-dimensional time units [1h = 1/((L/U)/3600) if U in m/s and L in m]
 n_ens = 18                              # number of ensemble members
-TIMEOUT_PAR = n_ens*4			# time to wait until all forecasts running in parallel are over
-Nmeas = 48                              # number of cycles
+TIMEOUT_PAR = n_ens*6			# time to wait until all forecasts running in parallel are over
+Nmeas = 3                              # number of cycles
 Nforec = 13				#  duration of the *dtmeasure*-long forecast launched at the end of each analysis step
 NIAU = 1000				# suppress injection of additional inflation with IAU for the first NIAU hours since assimilation 
 tn = 0.0                                # initial time
@@ -98,10 +98,14 @@ rtpp    : Relaxation to Prior Perturbations scaling factor
 rtps    : Relaxation to Prior Spread scaling factor
 '''
 # MUST BE FLOATING POINT
-loc = [ 0.5, 1.0, 1.5, 2.0 ]
-add_inf = [0.05, 0.08, 0.1, 0.12, 0.15, 0.2, 0.3, 0.4, 0.5 ]
+#loc = [ 0.5, 1.0, 1.5, 2.0 ]
+#add_inf = [0.05, 0.08, 0.1, 0.12, 0.15, 0.2, 0.3, 0.4, 0.5 ]
+#rtpp = [0.5]
+#rtps = [ 0.1, 0.3, 0.5, 0.7, 0.9 ]
+loc = [ 1.0 ]
+add_inf = [ 0.15 ]
 rtpp = [0.5]
-rtps = [ 0.1, 0.3, 0.5, 0.7, 0.9 ]
+rtps = [ 0.7 ]
 
 ##################################################################
 #			END OF PROGRAM				 #

@@ -254,9 +254,9 @@ def step_forward_modRSW(U,U_rel,dt,Neq,Nk,Kk,Ro,alpha2,Hc,Hr,cc2,beta,g,tau_rel)
     #'''%%%----- compute extraneous forcing terms S(U) -----%%%'''
     S = np.zeros((Neq,Nk))
     S[0,:] = 0.
-    S[1,:] = (1/Ro)*U[2,:]
+    S[1,:] = (1./Ro)*U[2,:]
     S[3,:] = -alpha2*U[3,:] 
-    S[2,:] = -(1/Ro)*U[1,:] + (U[0,:]*U_rel[2,:]-U[2,:])/tau_rel 
+    S[2,:] = -(1./Ro)*U[1,:] + (U[0,:]*U_rel[2,:]-U[2,:])/tau_rel 
 
     left = list(range(0,Nk))
     right = np.append(list(range(1,Nk)),0)

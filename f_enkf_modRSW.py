@@ -17,8 +17,8 @@ import os
 ##################################################################
 
 
-def generate_truth(U_tr_array, U_rel, Neq, Nk_tr, tr_grid, cfl_tr, assim_time, tmax, f_path_name, Hc, Hr, cc2, beta, alpha2, g, Ro, tau_rel):
-#def generate_truth(U_tr_array, B_tr, Neq, Nk_tr, tr_grid, cfl_tr, assim_time, tmax, f_path_name, Hc, Hr, cc2, beta, alpha2, g):
+#def generate_truth(U_tr_array, U_rel, Neq, Nk_tr, tr_grid, cfl_tr, assim_time, tmax, f_path_name, Hc, Hr, cc2, beta, alpha2, g, Ro, tau_rel):
+def generate_truth(U_tr_array, B_tr, Neq, Nk_tr, tr_grid, cfl_tr, assim_time, tmax, f_path_name, Hc, Hr, cc2, beta, alpha2, g):
     
     from f_modRSW import time_step, step_forward_topog, step_forward_modRSW
 
@@ -45,8 +45,8 @@ def generate_truth(U_tr_array, U_rel, Neq, Nk_tr, tr_grid, cfl_tr, assim_time, t
             dt = dt - (tn - tmeasure) + 1e-12
             tn = tmeasure + 1e-12
 
-        U_tr = step_forward_modRSW(U_tr,U_rel,dt,Neq,Nk_tr,Kk_tr,Ro,alpha2,Hc,Hr,cc2,beta,g,tau_rel)
-#        U_tr = step_forward_topog(U_tr,B_tr,dt,tn,Neq,Nk_tr,Kk_tr,Hc,Hr,cc2,beta,alpha2,g)
+#        U_tr = step_forward_modRSW(U_tr,U_rel,dt,Neq,Nk_tr,Kk_tr,Ro,alpha2,Hc,Hr,cc2,beta,g,tau_rel)
+        U_tr = step_forward_topog(U_tr,B_tr,dt,tn,Neq,Nk_tr,Kk_tr,Hc,Hr,cc2,beta,alpha2,g)
 #        print 't_tr =',tn
 
         if tn > tmeasure:
@@ -170,7 +170,6 @@ def analysis_step_enkf_v3(U_fc, U_tr, Y_obs, H, tmeasure, dtmeasure, index, pars
     X = np.empty([n_d,n_ens])
     for N in range(0,n_ens):
         X[:,N] = U_fc[:,:,N].flatten()
-    
 
     '''
         Step 2.(a)

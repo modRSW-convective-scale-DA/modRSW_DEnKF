@@ -68,6 +68,7 @@ h_obs_mask = config.h_obs_mask
 hu_obs_mask = config.hu_obs_mask
 hr_obs_mask = config.hr_obs_mask
 if(Neq==4): hv_obs_mask = config.hv_obs_mask
+ass_freq = config.ass_freq
 
 #################################################################
 # create directory for output
@@ -95,8 +96,8 @@ np.save(str(outdir+'/B_tr'),B_tr) #save topog for plotting
 U_tr_array = np.empty([Neq,Nk_tr,Nmeas+Nforec+1])
 U_tr_array[:,:,0] = U0_tr
 
-f_path_name = str(outdir+'/U_tr_array_2xres_1h.npy')
-f_obs_name = str(outdir+'/Y_obs_2xres_1h.npy')
+f_path_name = str(outdir+'/U_tr_array_2xres_'+ass_freq+'.npy')
+f_obs_name = str(outdir+'/Y_obs_2xres_'+ass_freq+'.npy')
 f_H_name = str(outdir+'/H.npy')
 
 U_rel_tr = U_relax(Neq,Nk_tr,L,V,xc_tr,U0_tr)
@@ -106,7 +107,8 @@ try:
     U_tr_array = np.load(f_path_name)
 except:
     print(' *** Generating truth trajectory... *** ')
-    U_tr_array = generate_truth(U_tr_array, U_rel_tr, Neq, Nk_tr, tr_grid, cfl_tr, assim_time, tmax, f_path_name, Hc, Hr, cc2, beta, alpha2, g, Ro, tau_rel)
+    if(Neq==3): U_tr_array = generate_truth(U_tr_array, B_tr, Neq, Nk_tr, tr_grid, cfl_tr, assim_time, tmax, f_path_name, Hc, Hr, cc2, beta, alpha2, g)
+    if(Neq==4): U_tr_array = generate_truth(U_tr_array, U_rel_tr, Neq, Nk_tr, tr_grid, cfl_tr, assim_time, tmax, f_path_name, Hc, Hr, cc2, beta, alpha2, g, Ro, tau_rel)
 
 ##################################################################    
 # Pseudo-observations

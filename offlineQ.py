@@ -36,7 +36,6 @@ alpha2 = config.alpha2
 U_relax = config.U_relax
 tau_rel = config.tau_rel
 g = config.g
-table_file_name = config.table_file_name
 model_noise = config.model_noise
 Nhr = config.Nhr
 Q_FUNC = config.Q_FUNC
