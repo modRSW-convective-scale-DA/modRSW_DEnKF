@@ -202,79 +202,78 @@ print('tmeasure = ', tmeasure)
 # Load the model error covariance matrix
 ##################################################################
 Q = np.load(str(outdir + '/Qnew.npy'))
-
-while tmeasure-dtmeasure <= tmax and index < Tfc:
-    print(' ')
-    print('----------------------------------------------')
-    print('---------- ENSEMBLE FORECAST: START ----------')
-    print('----------------------------------------------')
-    print(' ')
         
-    try:
-        os.sched_setaffinity(0, range(0, os.cpu_count()))
-        num_cores_use = n_ens
+if __name__ == '__main__': 
+
+    while tmeasure-dtmeasure <= tmax and index < Tfc:
+        print(' ')
+        print('----------------------------------------------')
+        print('---------- ENSEMBLE FORECAST: START ----------')
+        print('----------------------------------------------')
+        print(' ')
+        
+        try:
+            num_cores_use = os.cpu_count()
     
-        print('Number of cores used:', num_cores_use) 
-        print('Starting ensemble integrations from time =', assim_time[index], ' to', assim_time[index+1])
-        print(' *** Started: ', str(datetime.now()))
-        print(np.shape(U))
+            print('Number of cores used:', num_cores_use) 
+            print('Starting ensemble integrations from time =', assim_time[index], ' to', assim_time[index+1])
+            print(' *** Started: ', str(datetime.now()))
+            print(np.shape(U))
                 
-        ### ADDITIVE INFLATION (moved to precede the forecast) ###
-        q = add_inf[j] * np.random.multivariate_normal(np.zeros(n_d), Q, n_ens)
-        q_ave = np.mean(q,axis=0)
-        q = q - q_ave
-        q = q.T
-
-        pool = mp.Pool(processes=num_cores_use)
-        mp_out = [pool.apply_async(ens_forecast_topog, args=(N, U, B, q, Neq, Nk_fc, Kk_fc, cfl_fc, assim_time, index, tmeasure, dtmeasure, Hc, Hr, cc2, beta, alpha2, g)) for N in range(0,n_ens)]
-        U = [p.get() for p in mp_out]
-        pool.close()
-        pool.join()
-    
-        print(' All ensembles integrated forward from time =', assim_time[index],' to', assim_time[index+1])
-        print(' *** Ended: ', str(datetime.now()))
-        print(np.shape(U))
-    
-        U =np.swapaxes(U,0,1)
-        U =np.swapaxes(U,1,2)
-    
-        print(np.shape(U))
-    
-        print(' ')
-        print('----------------------------------------------')
-        print('------------- FORECAST STEP: END -------------')
-        print('----------------------------------------------')
-        print(' ')
+            ### ADDITIVE INFLATION (moved to precede the forecast) ###
+            q = add_inf[j] * np.random.multivariate_normal(np.zeros(n_d), Q, n_ens)
+            q_ave = np.mean(q,axis=0)
+            q = q - q_ave
+            q = q.T
         
-        ##################################################################
-        # save data for calculating crps and error at this time then integrate forward  #
-        ##################################################################
+            pool = mp.Pool(processes=num_cores_use)
+            mp_out = [pool.apply_async(ens_forecast_topog, args=(N, U, B, q, Neq, Nk_fc, Kk_fc, cfl_fc, assim_time, index, tmeasure, dtmeasure, Hc, Hr, cc2, beta, alpha2, g)) for N in range(0,n_ens)]
+            U = [p.get() for p in mp_out]
+            pool.close()
+            pool.join()
     
-        # transform to X for saving
-        U_tmp = np.copy(U)
-        U_tmp[1:,:,:] = U_tmp[1:,:,:]/U_tmp[0,:,:]
-        for N in range(0,n_ens):
-            X_fc_array[:,N,index+1] = U_tmp[:,:,N].flatten()
+            print(' All ensembles integrated forward from time =', assim_time[index],' to', assim_time[index+1])
+            print(' *** Ended: ', str(datetime.now()))
+            print(np.shape(U))
     
-       # U = UU # update U for next integration
-
-        # on to next assim_time
-        index = index + 1
-        tmeasure = tmeasure + dtmeasure
+            U =np.swapaxes(U,0,1)
+            U =np.swapaxes(U,1,2)
     
-    except (RuntimeWarning, mp.TimeoutError) as err:
+            print(np.shape(U))
+    
+            print(' ')
+            print('----------------------------------------------')
+            print('------------- FORECAST STEP: END -------------')
+            print('----------------------------------------------')
+            print(' ')
         
-        pool.terminate()
-        pool.join()
-        print(err)
-        print('-------------- Forecast failed! --------------')        
-        print(' ')
-        print('----------------------------------------------')
-        print('------------- FORECAST STEP: END -------------')
-        print('----------------------------------------------')
-        print(' ')
+            ##################################################################
+            # save data for calculating crps and error at this time then integrate forward  #
+            ##################################################################
+    
+            # transform to X for saving
+            U_tmp = np.copy(U)
+            U_tmp[1:,:,:] = U_tmp[1:,:,:]/U_tmp[0,:,:]
+            for N in range(0,n_ens):
+                X_fc_array[:,N,index+1] = U_tmp[:,:,N].flatten()
+    
+            # on to next assim_time
+            index = index + 1
+            tmeasure = tmeasure + dtmeasure
+    
+        except (RuntimeWarning, mp.TimeoutError) as err:
+        
+            pool.terminate()
+            pool.join()
+            print(err)
+            print('-------------- Forecast failed! --------------')        
+            print(' ')
+            print('----------------------------------------------')
+            print('------------- FORECAST STEP: END -------------')
+            print('----------------------------------------------')
+            print(' ')
 
-        tmeasure = tmax + dtmeasure
+            tmeasure = tmax + dtmeasure
  
 np.save(str(dirnEDT+'/X_EFS_array_T'+str(T)),X_fc_array)
 print(' *** Data saved in :', dirnEDT)

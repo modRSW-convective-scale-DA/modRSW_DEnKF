@@ -127,7 +127,6 @@ def summary_plot(x, var_name, graph_title, axis_labels, values, minval, maxval, 
 #                      share_all=True)
 
     for i, ax in enumerate(axlist):
-        #mymap = cm.YlOrBr
         mymap.set_bad('g', 1.0)
         im = ax.pcolormesh(x[:, :, i], cmap=mymap, vmin=minval, vmax=maxval)
 
@@ -136,7 +135,7 @@ def summary_plot(x, var_name, graph_title, axis_labels, values, minval, maxval, 
         axlist.cbar_axes[0].tick_params(labelsize='large')
 
         # Avoid unwanted blank rows and/or columns.
-        ax.set_adjustable('box-forced')
+        ax.set_adjustable('box')
 
         # Annotate.
         ax.set_title('{} = {}'.format(axis_labels[2], values[2][i]),
@@ -212,7 +211,7 @@ for m in range(0,len(indices)):
 ##################################################################
 print(' *** PLOT: STATS matrix with spread and RMSE ***')
 ##################################################################
-
+mymap = cm.get_cmap("YlOrRd").copy()
 # Compute min/max for forecast spread and RMSE.
 for n in range(len(lead_times)):
 #x = np.ma.masked_invalid([err_fc, rmse_fc, spr_fc, err_an, rmse_an, spr_an])
@@ -234,11 +233,11 @@ for n in range(len(lead_times)):
         # Rearrange data in the order loc, rtps, add_inf and mask out nan values.
         summary_plot(np.ma.masked_invalid(np.swapaxes(spr_fc[m,:,:,0,:,n], 0, 2)), 'spr',
                  'SPR ('+str(lead_times[n])+'hrs)', ['$\\alpha_{RTPS}$', '$\gamma_a$', '$L_{loc}$'],
-                 [rtps, add_inf, loc], minvaly, maxvaly, str(figsdir + '/spr_'+var[m]+'_fc_+'+str(lead_times[n])+'.pdf'),cm.YlOrRd)
+                 [rtps, add_inf, loc], minvaly, maxvaly, str(figsdir + '/spr_'+var[m]+'_fc_+'+str(lead_times[n])+'.pdf'),mymap)
 
         summary_plot(np.ma.masked_invalid(np.swapaxes(rmse_fc[m,:,:,0,:,n], 0, 2)), 'rmse', 
                  'RMSE ('+str(lead_times[n])+'hrs)', ['$\\alpha_{RTPS}$', '$\gamma_a$', '$L_{loc}$'],
-                 [rtps, add_inf, loc], minvalx, maxvalx, str(figsdir + '/rmse_'+var[m]+'_fc_+'+str(lead_times[n])+'.pdf'),cm.YlOrRd)
+                 [rtps, add_inf, loc], minvalx, maxvalx, str(figsdir + '/rmse_'+var[m]+'_fc_+'+str(lead_times[n])+'.pdf'),mymap)
 
 
 # Compute min/max for analysis spread and RMSE.
@@ -253,11 +252,11 @@ for m in range(Neq+1):
 
     summary_plot(np.ma.masked_invalid(np.swapaxes(rmse_an[m,:,:,0,:], 0, 2)),'rmse', 
                  'RMSE (analysis)', ['$\\alpha_{RTPS}$', '$\gamma_a$', '$L_{loc}$'],
-                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/rmse_'+var[m]+'_an.pdf'),cm.YlOrRd)
+                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/rmse_'+var[m]+'_an.pdf'),mymap)
 
     summary_plot(np.ma.masked_invalid(np.swapaxes(spr_an[m,:,:,0,:], 0, 2)), 'spr',
                  'SPR (analysis)', ['$\\alpha_{RTPS}$', '$\gamma_a$', '$L_{loc}$'],
-                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/spr_'+var[m]+'_an.pdf'),cm.YlOrRd)
+                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/spr_'+var[m]+'_an.pdf'),mymap)
 
 ##################################################################
 print(' *** PLOT: STATS matrix with MAE ***')
@@ -276,7 +275,7 @@ for m in range(Neq+1):
 
         summary_plot(np.ma.masked_invalid(np.swapaxes(err_fc[m,:,:,0,:,n], 0, 2)), 'mae',
                  'MAE ('+str(lead_times[n])+'hrs)', ['$\\alpha_{RTPS}$', '$\gamma_a$', '$L_{loc}$'],
-                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/err_'+var[m]+'_fc_+'+str(lead_times[n])+'.pdf'),cm.YlOrRd)
+                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/err_'+var[m]+'_fc_+'+str(lead_times[n])+'.pdf'),mymap)
 
     y = np.ma.masked_invalid([err_an[m,:,:,:,:]])
 
@@ -289,7 +288,7 @@ for m in range(Neq+1):
     summary_plot(np.ma.masked_invalid(np.swapaxes(err_an[m,:,:,0,:], 0, 2)), 'mae',
              'MAE (analysis)', ['$\\alpha_{RTPS}$', '$\gamma_a$', '$L_{loc}$'],
 
-             [rtps, add_inf, loc], minval, maxval, str(figsdir + '/err_'+var[m]+'_an.pdf'),cm.YlOrRd)
+             [rtps, add_inf, loc], minval, maxval, str(figsdir + '/err_'+var[m]+'_an.pdf'),mymap)
 
 
 ##################################################################
@@ -309,7 +308,7 @@ for m in range(Neq+1):
 
         summary_plot(np.ma.masked_invalid(np.swapaxes(crps_fc[m,:,:,0,:,n], 0, 2)), 'crps', 
              'CRPS ('+str(lead_times[n])+'hrs)', ['$\\alpha_{RTPS}$', '$\gamma_a$', '$L_{loc}$'],
-             [rtps, add_inf, loc], minval, maxval, str(figsdir + '/crps_'+var[m]+'_fc_+'+str(lead_times[n])+'.pdf'),cm.YlOrRd)
+             [rtps, add_inf, loc], minval, maxval, str(figsdir + '/crps_'+var[m]+'_fc_+'+str(lead_times[n])+'.pdf'),mymap)
 
     y = np.ma.masked_invalid([crps_an[m,:,:,:,:]])
 
@@ -320,12 +319,12 @@ for m in range(Neq+1):
 
     summary_plot(np.ma.masked_invalid(np.swapaxes(crps_an[m,:,:,0,:], 0, 2)), 'crps',
                  'CRPS (analysis)', ['$\\alpha_{RTPS}$', '$\gamma_a$', '$L_{loc}$'],
-                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/crps_'+var[m]+'_an.pdf'),cm.YlOrRd)
+                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/crps_'+var[m]+'_an.pdf'),mymap)
 
 ##################################################################
 print(' *** PLOT: OI matrix ***')
 ##################################################################
-
+mymap2 = cm.get_cmap("BrBG").copy() 
 for m in range(Neq+1):
     # Compute min/max for CRPS.
     x = np.ma.masked_invalid(OI[m,:,:,:,:])
@@ -337,7 +336,7 @@ for m in range(Neq+1):
 
     summary_plot(np.ma.masked_invalid(np.swapaxes(OI[m,:,:,0,:], 0, 2)), 'OI',
                  'OID', ['$\\alpha_{RTPS}$', '$\gamma_a$', '$L_{loc}$'],
-                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/oi_'+var[m]+'.pdf'),cm.BrBG)
+                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/oi_'+var[m]+'.pdf'),mymap2)
 
 ##################################################################
 print(' *** PLOT: SPREAD-RMSE DIFFERENCE ***')
@@ -377,11 +376,11 @@ for m in range(Neq+1):
     
         summary_plot(np.ma.masked_invalid(np.swapaxes(sprrmse_ratio_fc[m,:,:,0,:,n], 0, 2)),'sprrmse_ratio',
                  'SPR/RMSE ('+str(lead_times[n])+'hrs)', ['$\\alpha_{RTPS}$', '$\gamma_a$', '$L_{loc}$'],
-                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/sprrmse_ratio_'+var[m]+'_fc_+'+str(lead_times[n])+'.pdf'),cm.BrBG)
+                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/sprrmse_ratio_'+var[m]+'_fc_+'+str(lead_times[n])+'.pdf'),mymap2)
 
     summary_plot(np.ma.masked_invalid(np.swapaxes(sprrmse_ratio_an[m,:,:,0,:], 0, 2)),'sprrmse_ratio',
                  'SPR/RMSE (analysis)', ['$\\alpha_{RTPS}$', '$\gamma_a$', '$L_{loc}$'],
-                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/sprrmse_ratio_'+var[m]+'_an.pdf'),cm.BrBG)
+                 [rtps, add_inf, loc], minval, maxval, str(figsdir + '/sprrmse_ratio_'+var[m]+'_an.pdf'),mymap2)
 
 ##################################################################
 #print(' *** PLOT: FORECAST-ANALYSY RMSE***')
