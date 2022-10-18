@@ -98,14 +98,10 @@ rtpp    : Relaxation to Prior Perturbations scaling factor
 rtps    : Relaxation to Prior Spread scaling factor
 '''
 # MUST BE FLOATING POINT
-#loc = [ 0.5, 1.0, 1.5, 2.0 ]
-#add_inf = [0.05, 0.08, 0.1, 0.12, 0.15, 0.2, 0.3, 0.4, 0.5 ]
-#rtpp = [0.5]
-#rtps = [ 0.1, 0.3, 0.5, 0.7, 0.9 ]
-loc = [ 1.0 ]
-add_inf = [ 0.15 ]
+loc = [ 0.5, 1.0, 1.5, 2.0 ]
+add_inf = [0.05, 0.08, 0.1, 0.12, 0.15, 0.2, 0.3, 0.4, 0.5 ]
 rtpp = [0.5]
-rtps = [ 0.7 ]
+rtps = [ 0.1, 0.3, 0.5, 0.7, 0.9 ]
 
 ##################################################################
 #			END OF PROGRAM				 #
